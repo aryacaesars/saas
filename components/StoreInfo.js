@@ -84,7 +84,7 @@ export default function StoreInfo() {
               className="input"
               required />
           </div>
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-primary flex items-center px-4 py-2">
             <Save size={16} className="mr-2" /> Update Store Info
           </button>
         </form>
@@ -92,7 +92,7 @@ export default function StoreInfo() {
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">Cashiers</h2>
         <form onSubmit={handleAddCashier} className="mb-4">
-          <div className="flex">
+          <div className="flex mb-4">
             <input
               type="text"
               value={newCashier}
@@ -100,10 +100,11 @@ export default function StoreInfo() {
               className="input flex-grow rounded-r-none"
               placeholder="Enter cashier name"
               required />
-            <button type="submit" className="btn btn-primary rounded-l-none">
-              <Plus size={16} className="mr-2" /> Add Cashier
+            </div>
+            <button type="submit" className="btn btn-primary flex items-center">
+            <Plus size={16} className="mr-4" />Add Cashier
             </button>
-          </div>
+
         </form>
         <ul className="divide-y">
           {cashiers.map((cashier) => (

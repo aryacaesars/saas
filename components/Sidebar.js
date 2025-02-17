@@ -46,7 +46,7 @@ export default function Sidebar() {
       `}>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between h-16 px-4 border-b">
-          <span className="text-xl font-bold text-blue-600">Toko Kelontong</span>
+          <span className="text-xl font-bold text-black">Shop Management</span>
           <button
             className="md:hidden p-2 rounded-lg hover:bg-gray-100"
             onClick={() => setIsOpen(false)}>
@@ -63,7 +63,7 @@ export default function Sidebar() {
                   className={`
                     flex items-center px-4 py-2 rounded-lg
                     transition-colors duration-200
-                    ${pathname === item.href ? "bg-blue-100 text-blue-600" : "text-gray-600 hover:bg-gray-100"}
+                    ${pathname === item.href ? "bg-gray-300 rounded-[7px] text-black" : "text-gray-600 hover:bg-gray-100"}
                   `}
                   onClick={() => {
                     if (window.innerWidth < 768) {

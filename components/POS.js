@@ -217,13 +217,13 @@ export default function POS() {
           <div className="flex space-x-4">
             <button
               onClick={() => setPaymentMethod("cash")}
-              className={`btn ${paymentMethod === "cash" ? "btn-primary" : "btn-secondary"}`}
+              className={`btn flex items-center ${paymentMethod === "cash" ? "btn-primary" : "btn-secondary"}`}
             >
               <DollarSign size={16} className="mr-2" /> Tunai
             </button>
             <button
               onClick={() => setPaymentMethod("qris")}
-              className={`btn ${paymentMethod === "qris" ? "btn-primary" : "btn-secondary"}`}
+              className={`btn flex items-center ${paymentMethod === "qris" ? "btn-primary" : "btn-secondary"}`}
             >
               <CreditCard size={16} className="mr-2" /> QRIS
             </button>
@@ -251,7 +251,7 @@ export default function POS() {
         )}
         <button
           onClick={handlePayment}
-          className="btn btn-primary"
+          className="btn btn-primary flex items-center"
           disabled={cart.length === 0 || (paymentMethod === "cash" && Number.parseFloat(cashAmount) < total)}
         >
           <ShoppingCart size={16} className="mr-2" /> Selesaikan Pembayaran
@@ -315,18 +315,9 @@ export default function POS() {
               </div>
 
               <div className="text-center text-sm">
-                <p className="mb-2">Link Kritik dan Saran:</p>
-                <p className="mb-4">kpntr.com/f/</p>
-                <div className="flex justify-center space-x-4">
                   <div className="text-center">
-                    <div className="font-bold">KASIR</div>
-                    <div>PINTAR</div>
+                    <div>Terima Kasih</div>
                   </div>
-                  <div className="text-center">
-                    <div>GET IT ON</div>
-                    <div>Google Play</div>
-                  </div>
-                </div>
               </div>
             </div>
 

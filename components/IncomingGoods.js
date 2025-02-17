@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Search, Edit } from "lucide-react"
+import { Plus, Search, Edit, Trash } from "lucide-react"
 
 export default function IncomingGoods() {
   const [products, setProducts] = useState([])
@@ -15,8 +15,10 @@ export default function IncomingGoods() {
   })
   const [newCategory, setNewCategory] = useState("")
   const [incomingGoods, setIncomingGoods] = useState([])
+  const [restockHistory, setRestockHistory] = useState([])
   const [supplier, setSupplier] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({
     productName: "",
@@ -36,6 +38,9 @@ export default function IncomingGoods() {
 
     const storedIncomingGoods = JSON.parse(localStorage.getItem("incomingGoods")) || []
     setIncomingGoods(storedIncomingGoods)
+
+    const storedRestockHistory = JSON.parse(localStorage.getItem("restockHistory")) || []
+    setRestockHistory(storedRestockHistory)
   }, [])
 
   const handleNewProductSubmit = (e) => {
@@ -95,6 +100,47 @@ export default function IncomingGoods() {
     }
   }
 
+  const handleProductSearch = (e) => {
+    e.preventDefault()
+    const product = products.find((p) => p.name.toLowerCase() === searchTerm.toLowerCase())
+    setSelectedProduct(product)
+  }
+
+  const handleUpdateProduct = (e) => {
+    e.preventDefault()
+    const updatedProducts = products.map((product) =>
+      product.id === selectedProduct.id ? { ...selectedProduct } : product
+    )
+    setProducts(updatedProducts)
+    localStorage.setItem("products", JSON.stringify(updatedProducts))
+
+    // Create new restock record for the update
+    const restockRecord = {
+      id: Date.now(),
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      category: selectedProduct.category,
+      quantity: Number(selectedProduct.stock),
+      purchasePrice: Number(selectedProduct.purchasePrice),
+      sellingPrice: Number(selectedProduct.price),
+      supplier: selectedProduct.supplier,
+      date: new Date().toISOString(),
+    }
+
+    const updatedRestockHistory = [...restockHistory, restockRecord]
+    setRestockHistory(updatedRestockHistory)
+    localStorage.setItem("restockHistory", JSON.stringify(updatedRestockHistory))
+
+    setSelectedProduct(null)
+  }
+
+  const handleDeleteProduct = (productId) => {
+    const updatedProducts = products.filter((product) => product.id !== productId)
+    setProducts(updatedProducts)
+    localStorage.setItem("products", JSON.stringify(updatedProducts))
+    setSelectedProduct(null)
+  }
+
   const handleEdit = (item) => {
     setEditingId(item.id)
     setEditForm({
@@ -146,6 +192,14 @@ export default function IncomingGoods() {
   }
 
   const filteredIncomingGoods = incomingGoods
+    .filter(
+      (item) =>
+        item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+
+  const filteredRestockHistory = restockHistory
     .filter(
       (item) =>
         item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -257,26 +311,109 @@ export default function IncomingGoods() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-primary flex items-center">
             <Plus size={16} className="mr-2" /> Tambah Produk
           </button>
         </form>
       </div>
 
-      <div className="card">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Riwayat Barang Masuk</h2>
-          <div className="relative">
+      <div className="card mb-6">
+        <h2 className="text-xl font-semibold mb-4">Cari Produk</h2>
+        <form onSubmit={handleProductSearch}>
+          <div className="mb-4">
+            <label htmlFor="searchTerm" className="label">
+              Nama Produk
+            </label>
             <input
               type="text"
-              placeholder="Cari..."
+              id="searchTerm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input pl-10"
+              className="input"
+              required
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           </div>
-        </div>
+          <button type="submit" className="btn btn-primary flex items-center">
+            <Search size={16} className="mr-2" /> Cari Produk
+          </button>
+        </form>
+
+        {selectedProduct && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">Update atau Hapus Produk</h3>
+            <form onSubmit={handleUpdateProduct}>
+              <div className="mb-4">
+                <label htmlFor="updateName" className="label">
+                  Nama Produk
+                </label>
+                <input
+                  type="text"
+                  id="updateName"
+                  value={selectedProduct.name}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
+                  className="input"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="updateCategory" className="label">
+                  Kategori
+                </label>
+                <input
+                  type="text"
+                  id="updateCategory"
+                  value={selectedProduct.category}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })}
+                  className="input"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="updatePrice" className="label">
+                  Harga Jual
+                </label>
+                <input
+                  type="number"
+                  id="updatePrice"
+                  value={selectedProduct.price}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, price: e.target.value })}
+                  className="input"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="updateStock" className="label">
+                  Jumlah Stok
+                </label>
+                <input
+                  type="number"
+                  id="updateStock"
+                  value={selectedProduct.stock}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: e.target.value })}
+                  className="input"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button type="submit" className="btn btn-primary">
+                  Update
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteProduct(selectedProduct.id)}
+                  className="btn btn-danger"
+                >
+                  <Trash size={16} className="mr-2" /> Hapus
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/* Riwayat Barang Masuk Section */}
+      <div className="card">
+        <h2 className="text-xl font-semibold mb-4">Riwayat Barang Masuk</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -372,9 +509,9 @@ export default function IncomingGoods() {
                       <td className="py-2 px-4">{item.productName}</td>
                       <td className="py-2 px-4">{item.category}</td>
                       <td className="py-2 px-4">{item.quantity}</td>
-                      <td className="py-2 px-4">Rp {item.purchasePrice.toLocaleString("id-ID")}</td>
-                      <td className="py-2 px-4">Rp {item.sellingPrice.toLocaleString("id-ID")}</td>
-                      <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity).toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {item.purchasePrice?.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {item.sellingPrice?.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity)?.toLocaleString("id-ID")}</td>
                       <td className="py-2 px-4">{item.supplier}</td>
                       <td className="py-2 px-4">
                         <button onClick={() => handleEdit(item)} className="btn btn-secondary">
@@ -383,6 +520,41 @@ export default function IncomingGoods() {
                       </td>
                     </>
                   )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Riwayat Re-Stock Section */}
+      <div className="card">
+        <h2 className="text-xl font-semibold mb-4">Riwayat Re-Stock</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-2 px-4">Tanggal</th>
+                <th className="text-left py-2 px-4">Produk</th>
+                <th className="text-left py-2 px-4">Kategori</th>
+                <th className="text-left py-2 px-4">Jumlah</th>
+                <th className="text-left py-2 px-4">Harga Beli</th>
+                <th className="text-left py-2 px-4">Harga Jual</th>
+                <th className="text-left py-2 px-4">Total</th>
+                <th className="text-left py-2 px-4">Supplier</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRestockHistory.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="py-2 px-4">{new Date(item.date).toLocaleDateString("id-ID")}</td>
+                  <td className="py-2 px-4">{item.productName}</td>
+                  <td className="py-2 px-4">{item.category}</td>
+                  <td className="py-2 px-4">{item.quantity}</td>
+                  <td className="py-2 px-4">Rp {item.purchasePrice?.toLocaleString("id-ID")}</td>
+                  <td className="py-2 px-4">Rp {item.sellingPrice?.toLocaleString("id-ID")}</td>
+                  <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity)?.toLocaleString("id-ID")}</td>
+                  <td className="py-2 px-4">{item.supplier}</td>
                 </tr>
               ))}
             </tbody>
@@ -410,7 +582,7 @@ export default function IncomingGoods() {
               <button
                 type="button"
                 onClick={() => document.getElementById("addCategoryDialog").close()}
-                className="btn btn-secondary"
+                className="btn btn-danger"
               >
                 Batal
               </button>
