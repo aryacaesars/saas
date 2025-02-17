@@ -63,7 +63,7 @@ export default function Sidebar() {
                   className={`
                     flex items-center px-4 py-2 rounded-lg
                     transition-colors duration-200
-                    ${pathname === item.href ? "bg-gray-300 rounded-[10px] text-black" : "text-gray-600 hover:bg-gray-100"}
+                    ${pathname === item.href ? "bg-gray-300 rounded-xl text-black" : "text-gray-600 hover:bg-gray-100"}
                   `}
                   onClick={() => {
                     if (window.innerWidth < 768) {
