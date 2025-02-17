@@ -18,7 +18,6 @@ export default function IncomingGoods() {
   const [restockHistory, setRestockHistory] = useState([])
   const [supplier, setSupplier] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedProduct, setSelectedProduct] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({
     productName: "",
@@ -141,54 +140,45 @@ export default function IncomingGoods() {
     setSelectedProduct(null)
   }
 
-  const handleEdit = (item) => {
-    setEditingId(item.id)
-    setEditForm({
-      productName: item.productName,
-      category: item.category,
-      quantity: item.quantity,
-      purchasePrice: item.purchasePrice,
-      sellingPrice: item.sellingPrice,
-      supplier: item.supplier,
-    })
+  const handleProductSearch = (e) => {
+    e.preventDefault()
+    const product = products.find((p) => p.name.toLowerCase() === searchTerm.toLowerCase())
+    setSelectedProduct(product)
   }
 
-  const handleEditSubmit = (e) => {
+  const handleUpdateProduct = (e) => {
     e.preventDefault()
-    const updatedIncomingGoods = incomingGoods.map((item) => {
-      if (item.id === editingId) {
-        return {
-          ...item,
-          ...editForm,
-          quantity: Number(editForm.quantity),
-          purchasePrice: Number(editForm.purchasePrice),
-          sellingPrice: Number(editForm.sellingPrice),
-        }
-      }
-      return item
-    })
-
-    setIncomingGoods(updatedIncomingGoods)
-    localStorage.setItem("incomingGoods", JSON.stringify(updatedIncomingGoods))
-
-    // Update product in products list
-    const updatedProducts = products.map((product) => {
-      if (product.id === editingId) {
-        return {
-          ...product,
-          name: editForm.productName,
-          category: editForm.category,
-          price: Number(editForm.sellingPrice),
-          stock: Number(editForm.quantity),
-        }
-      }
-      return product
-    })
-
+    const updatedProducts = products.map((product) =>
+      product.id === selectedProduct.id ? { ...selectedProduct } : product
+    )
     setProducts(updatedProducts)
     localStorage.setItem("products", JSON.stringify(updatedProducts))
 
-    setEditingId(null)
+    // Create new restock record for the update
+    const restockRecord = {
+      id: Date.now(),
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      category: selectedProduct.category,
+      quantity: Number(selectedProduct.stock),
+      purchasePrice: Number(selectedProduct.purchasePrice),
+      sellingPrice: Number(selectedProduct.price),
+      supplier: selectedProduct.supplier,
+      date: new Date().toISOString(),
+    }
+
+    const updatedRestockHistory = [...restockHistory, restockRecord]
+    setRestockHistory(updatedRestockHistory)
+    localStorage.setItem("restockHistory", JSON.stringify(updatedRestockHistory))
+
+    setSelectedProduct(null)
+  }
+
+  const handleDeleteProduct = (productId) => {
+    const updatedProducts = products.filter((product) => product.id !== productId)
+    setProducts(updatedProducts)
+    localStorage.setItem("products", JSON.stringify(updatedProducts))
+    setSelectedProduct(null)
   }
 
   const filteredIncomingGoods = incomingGoods
@@ -329,84 +319,9 @@ export default function IncomingGoods() {
               id="searchTerm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input"
-              required
+              className="input pl-10"
             />
-          </div>
-          <button type="submit" className="btn btn-primary flex items-center">
-            <Search size={16} className="mr-2" /> Cari Produk
-          </button>
-        </form>
-
-        {selectedProduct && (
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-4">Update atau Hapus Produk</h3>
-            <form onSubmit={handleUpdateProduct}>
-              <div className="mb-4">
-                <label htmlFor="updateName" className="label">
-                  Nama Produk
-                </label>
-                <input
-                  type="text"
-                  id="updateName"
-                  value={selectedProduct.name}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
-                  className="input"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="updateCategory" className="label">
-                  Kategori
-                </label>
-                <input
-                  type="text"
-                  id="updateCategory"
-                  value={selectedProduct.category}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })}
-                  className="input"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="updatePrice" className="label">
-                  Harga Jual
-                </label>
-                <input
-                  type="number"
-                  id="updatePrice"
-                  value={selectedProduct.price}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, price: e.target.value })}
-                  className="input"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="updateStock" className="label">
-                  Jumlah Stok
-                </label>
-                <input
-                  type="number"
-                  id="updateStock"
-                  value={selectedProduct.stock}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: e.target.value })}
-                  className="input"
-                  required
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <button type="submit" className="btn btn-primary">
-                  Update
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteProduct(selectedProduct.id)}
-                  className="btn btn-danger"
-                >
-                  <Trash size={16} className="mr-2" /> Hapus
-                </button>
-              </div>
-            </form>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           </div>
         )}
       </div>
@@ -426,7 +341,6 @@ export default function IncomingGoods() {
                 <th className="text-left py-2 px-4">Harga Jual</th>
                 <th className="text-left py-2 px-4">Total</th>
                 <th className="text-left py-2 px-4">Supplier</th>
-                <th className="text-left py-2 px-4">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -509,9 +423,9 @@ export default function IncomingGoods() {
                       <td className="py-2 px-4">{item.productName}</td>
                       <td className="py-2 px-4">{item.category}</td>
                       <td className="py-2 px-4">{item.quantity}</td>
-                      <td className="py-2 px-4">Rp {item.purchasePrice?.toLocaleString("id-ID")}</td>
-                      <td className="py-2 px-4">Rp {item.sellingPrice?.toLocaleString("id-ID")}</td>
-                      <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity)?.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {item.purchasePrice.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {item.sellingPrice.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity).toLocaleString("id-ID")}</td>
                       <td className="py-2 px-4">{item.supplier}</td>
                       <td className="py-2 px-4">
                         <button onClick={() => handleEdit(item)} className="btn btn-secondary">
