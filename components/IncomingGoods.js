@@ -141,6 +141,8 @@ export default function IncomingGoods() {
     setSelectedProduct(null)
   }
 
+  
+
   const filteredIncomingGoods = incomingGoods
     .filter(
       (item) =>

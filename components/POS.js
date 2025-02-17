@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Login from "./Login"
-import { ShoppingCart, DollarSign, CreditCard, Plus, Minus } from "lucide-react"
+import { ShoppingCart, DollarSign, CreditCard, Plus, Minus, LogOut } from "lucide-react"
 import html2canvas from "html2canvas"
 import { QRCodeSVG } from "qrcode.react"
 import Modal from "./Modal"
@@ -155,6 +155,12 @@ export default function POS() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Point of Sale</h1>
+        <button onClick={handleLogout} className="btn btn-danger flex items-center">
+          <LogOut size={16} className="mr-2" /> Logout
+        </button>
+      </div>
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">Produk</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

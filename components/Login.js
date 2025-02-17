@@ -48,7 +48,7 @@ export default function Login({ onLogin }) {
             required />
         </div>
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md">
+        <button type="submit" className="btn btn-primary text-white px-4 py-2 rounded-md">
           Login
         </button>
       </form>
