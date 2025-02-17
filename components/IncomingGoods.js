@@ -27,6 +27,7 @@ export default function IncomingGoods() {
     sellingPrice: "",
     supplier: "",
   })
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem("products")) || []
@@ -97,47 +98,6 @@ export default function IncomingGoods() {
       localStorage.setItem("categories", JSON.stringify(updatedCategories))
       setNewCategory("")
     }
-  }
-
-  const handleProductSearch = (e) => {
-    e.preventDefault()
-    const product = products.find((p) => p.name.toLowerCase() === searchTerm.toLowerCase())
-    setSelectedProduct(product)
-  }
-
-  const handleUpdateProduct = (e) => {
-    e.preventDefault()
-    const updatedProducts = products.map((product) =>
-      product.id === selectedProduct.id ? { ...selectedProduct } : product
-    )
-    setProducts(updatedProducts)
-    localStorage.setItem("products", JSON.stringify(updatedProducts))
-
-    // Create new restock record for the update
-    const restockRecord = {
-      id: Date.now(),
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      category: selectedProduct.category,
-      quantity: Number(selectedProduct.stock),
-      purchasePrice: Number(selectedProduct.purchasePrice),
-      sellingPrice: Number(selectedProduct.price),
-      supplier: selectedProduct.supplier,
-      date: new Date().toISOString(),
-    }
-
-    const updatedRestockHistory = [...restockHistory, restockRecord]
-    setRestockHistory(updatedRestockHistory)
-    localStorage.setItem("restockHistory", JSON.stringify(updatedRestockHistory))
-
-    setSelectedProduct(null)
-  }
-
-  const handleDeleteProduct = (productId) => {
-    const updatedProducts = products.filter((product) => product.id !== productId)
-    setProducts(updatedProducts)
-    localStorage.setItem("products", JSON.stringify(updatedProducts))
-    setSelectedProduct(null)
   }
 
   const handleProductSearch = (e) => {
@@ -323,7 +283,7 @@ export default function IncomingGoods() {
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           </div>
-        )}
+        </form>
       </div>
 
       {/* Riwayat Barang Masuk Section */}
@@ -423,9 +383,9 @@ export default function IncomingGoods() {
                       <td className="py-2 px-4">{item.productName}</td>
                       <td className="py-2 px-4">{item.category}</td>
                       <td className="py-2 px-4">{item.quantity}</td>
-                      <td className="py-2 px-4">Rp {item.purchasePrice.toLocaleString("id-ID")}</td>
-                      <td className="py-2 px-4">Rp {item.sellingPrice.toLocaleString("id-ID")}</td>
-                      <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity).toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {item.purchasePrice?.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {item.sellingPrice?.toLocaleString("id-ID")}</td>
+                      <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity)?.toLocaleString("id-ID")}</td>
                       <td className="py-2 px-4">{item.supplier}</td>
                       <td className="py-2 px-4">
                         <button onClick={() => handleEdit(item)} className="btn btn-secondary">
