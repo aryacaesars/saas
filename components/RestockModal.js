@@ -5,10 +5,11 @@ export default function RestockModal({ product, onRestock, onClose }) {
   const [purchasePrice, setPurchasePrice] = useState(product.purchasePrice);
   const [sellingPrice, setSellingPrice] = useState(product.sellingPrice);
   const [supplier, setSupplier] = useState(product.supplier);
+  const [additionalData, setAdditionalData] = useState(""); // New state for additional data
 
   const handleRestock = (e) => {
     e.preventDefault();
-    onRestock(product, quantity, purchasePrice, sellingPrice, supplier);
+    onRestock(product, quantity, purchasePrice, sellingPrice, supplier, additionalData); // Include additional data
     onClose();
   };
 
@@ -59,6 +60,16 @@ export default function RestockModal({ product, onRestock, onClose }) {
               onChange={(e) => setSupplier(e.target.value)}
               className="input"
               required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="additionalData" className="label">Additional Data</label>
+            <input
+              type="text"
+              id="additionalData"
+              value={additionalData}
+              onChange={(e) => setAdditionalData(e.target.value)}
+              className="input"
             />
           </div>
           <div className="flex justify-end gap-4">
