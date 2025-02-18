@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Login from "./Login"
-import { ShoppingCart, DollarSign, CreditCard, Plus, Minus, LogOut } from "lucide-react"
+import { ShoppingCart, DollarSign, CreditCard, Plus, Minus, LogOut, Trash } from "lucide-react"
 import html2canvas from "html2canvas"
 import { QRCodeSVG } from "qrcode.react"
 import Modal from "./Modal"
@@ -154,114 +154,104 @@ export default function POS() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Point of Sale</h1>
-        <button onClick={handleLogout} className="btn btn-danger flex items-center">
-          <LogOut size={16} className="mr-2" /> Logout
-        </button>
-      </div>
-      <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Produk</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <button
-              key={product.id}
-              onClick={() => addToCart(product)}
-              className={`p-4 border rounded-md text-left hover:bg-gray-100 transition-colors duration-200 ${
-                product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={product.stock === 0}
-            >
-              <h3 className="font-semibold">{product.name}</h3>
-              <p className="text-sm text-gray-600">Harga: Rp {product.price.toLocaleString("id-ID")}</p>
-              <p className="text-sm text-gray-600">Stok: {product.stock}</p>
-            </button>
-          ))}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="col-span-1 md:col-span-2">
+        <div className="flex justify-between items-center mb-4">
+          <button onClick={handleLogout} className="btn btn-danger flex items-center">
+            <LogOut size={16} className="mr-2" /> Logout
+          </button>
+        </div>
+        <div className="p-3 bg-white rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Produk</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {products.map((product) => (
+              <button
+                key={product.id}
+                onClick={() => addToCart(product)}
+                className={`p-2 border rounded-md text-left hover:bg-gray-100 transition-colors duration-200 ${
+                  product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={product.stock === 0}
+              >
+                <h3 className="font-semibold text-sm">{product.name}</h3>
+                <p className="text-xs text-gray-600">Harga: Rp {product.price.toLocaleString("id-ID")}</p>
+                <p className="text-xs text-gray-600">Stok: {product.stock}</p>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Keranjang</h2>
-        <ul className="mb-4 divide-y">
-          {cart.map((item) => (
-            <li key={item.id} className="py-2 flex justify-between items-center">
-              <span>{item.name}</span>
-              <div className="flex items-center">
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="btn btn-secondary p-1"
-                  disabled={item.quantity === 1}
-                >
-                  <Minus size={16} />
-                </button>
-                <input
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => updateQuantity(item.id, Number.parseInt(e.target.value))}
-                  className="w-16 text-center mx-2 input"
-                  min="1"
-                  max={item.stock}
-                />
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="btn btn-secondary p-1"
-                  disabled={item.quantity === item.stock}
-                >
-                  <Plus size={16} />
-                </button>
-                <span className="ml-4">Rp {(item.price * item.quantity).toLocaleString("id-ID")}</span>
-                <button onClick={() => removeFromCart(item.id)} className="btn btn-danger ml-2">
-                  Hapus
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div className="font-bold text-xl mb-4">Total: Rp {total.toLocaleString("id-ID")}</div>
-        <div className="mb-4">
-          <label className="label">Metode Pembayaran</label>
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setPaymentMethod("cash")}
-              className={`btn flex items-center ${paymentMethod === "cash" ? "btn-primary" : "btn-secondary"}`}
-            >
-              <DollarSign size={16} className="mr-2" /> Tunai
-            </button>
-            <button
-              onClick={() => setPaymentMethod("qris")}
-              className={`btn flex items-center ${paymentMethod === "qris" ? "btn-primary" : "btn-secondary"}`}
-            >
-              <CreditCard size={16} className="mr-2" /> QRIS
-            </button>
+      <div className="col-span-1">
+        <div className="card p-4 bg-white rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Keranjang</h2>
+          <ul className="mb-4 divide-y">
+            {cart.map((item) => (
+              <li key={item.id} className="py-2 flex justify-between items-center">
+                <span>{item.name}</span>
+                <div className="flex items-center">
+                  <input
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => updateQuantity(item.id, Number.parseInt(e.target.value))}
+                    className="w-16 text-center mx-2 input"
+                    min="1"
+                    max={item.stock}
+                  />
+
+                  <span className="ml-4">Rp {(item.price * item.quantity).toLocaleString("id-ID")}</span>
+                  <button onClick={() => removeFromCart(item.id)} className="btn btn-danger ml-2">
+                    <Trash size={16} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="font-bold text-xl mb-4">Total: Rp {total.toLocaleString("id-ID")}</div>
+          <div className="mb-4">
+            <label className="label">Metode Pembayaran</label>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setPaymentMethod("cash")}
+                className={`btn flex items-center ${paymentMethod === "cash" ? "btn-primary" : "btn-secondary"}`}
+              >
+                <DollarSign size={16} className="mr-2" /> Tunai
+              </button>
+              <button
+                onClick={() => setPaymentMethod("qris")}
+                className={`btn flex items-center ${paymentMethod === "qris" ? "btn-primary" : "btn-secondary"}`}
+              >
+                <CreditCard size={16} className="mr-2" /> QRIS
+              </button>
+            </div>
           </div>
+          {paymentMethod === "cash" && (
+            <div className="mb-4">
+              <label htmlFor="cashAmount" className="label">
+                Jumlah Tunai
+              </label>
+              <input
+                type="number"
+                id="cashAmount"
+                value={cashAmount}
+                onChange={(e) => calculateChange(e.target.value)}
+                className="input"
+              />
+            </div>
+          )}
+          {paymentMethod === "qris" && (
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Kode QRIS</h3>
+              <QRCodeSVG value={qrisCode || `QRIS${Date.now()}${total}`} size={200} />
+            </div>
+          )}
+          <button
+            onClick={handlePayment}
+            className="btn btn-primary flex items-center"
+            disabled={cart.length === 0 || (paymentMethod === "cash" && Number.parseFloat(cashAmount) < total)}
+          >
+            <ShoppingCart size={16} className="mr-2" /> Selesaikan Pembayaran
+          </button>
         </div>
-        {paymentMethod === "cash" && (
-          <div className="mb-4">
-            <label htmlFor="cashAmount" className="label">
-              Jumlah Tunai
-            </label>
-            <input
-              type="number"
-              id="cashAmount"
-              value={cashAmount}
-              onChange={(e) => calculateChange(e.target.value)}
-              className="input"
-            />
-          </div>
-        )}
-        {paymentMethod === "qris" && (
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Kode QRIS</h3>
-            <QRCodeSVG value={qrisCode || `QRIS${Date.now()}${total}`} size={200} />
-          </div>
-        )}
-        <button
-          onClick={handlePayment}
-          className="btn btn-primary flex items-center"
-          disabled={cart.length === 0 || (paymentMethod === "cash" && Number.parseFloat(cashAmount) < total)}
-        >
-          <ShoppingCart size={16} className="mr-2" /> Selesaikan Pembayaran
-        </button>
       </div>
 
       {showReceipt && (
