@@ -9,6 +9,9 @@ import Modal from "./Modal"
 
 export default function POS() {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState([])
   const [total, setTotal] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState("cash")
@@ -31,6 +34,10 @@ export default function POS() {
 
     const loggedInCashier = JSON.parse(localStorage.getItem("loggedInCashier"))
     setCashier(loggedInCashier)
+
+    // Fetch categories from incoming goods
+    const storedCategories = JSON.parse(localStorage.getItem("categories")) || []
+    setCategories(storedCategories)
   }, [])
 
   useEffect(() => {
@@ -149,6 +156,13 @@ export default function POS() {
     setCashier(null)
   }
 
+  const filteredProducts = products.filter((product) => {
+    return (
+      (selectedCategory === "" || product.category === selectedCategory) &&
+      (searchTerm === "" || product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+  })
+
   if (!cashier) {
     return <Login onLogin={handleLogin} />
   }
@@ -163,8 +177,29 @@ export default function POS() {
         </div>
         <div className="p-3 bg-white rounded-xl shadow-md">
           <h2 className="text-xl font-semibold mb-4">Produk</h2>
+          <div className="mb-4 flex space-x-4">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="input"
+            >
+              <option value="">Semua Kategori</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Cari produk..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input"
+            />
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <button
                 key={product.id}
                 onClick={() => addToCart(product)}
