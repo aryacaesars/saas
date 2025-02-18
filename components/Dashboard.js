@@ -88,10 +88,12 @@ export default function Dashboard() {
     const storedSales = JSON.parse(localStorage.getItem("sales")) || []
     const storedProducts = JSON.parse(localStorage.getItem("products")) || []
     const storedIncoming = JSON.parse(localStorage.getItem("incomingGoods")) || []
+    const storedRestockHistory = JSON.parse(localStorage.getItem("restockHistory")) || []
 
     // Calculate summary
     const totalSales = storedSales.reduce((sum, sale) => sum + sale.total, 0)
-    const expenses = storedIncoming.reduce((total, item) => total + item.purchasePrice * item.quantity, 0)
+    const expenses = storedIncoming.reduce((total, item) => total + item.purchasePrice * item.quantity, 0) +
+                     storedRestockHistory.reduce((total, item) => total + item.purchasePrice * item.quantity, 0)
     const profit = totalSales - expenses
     const lowStock = storedProducts.filter((product) => product.stock < 10)
 
@@ -109,7 +111,7 @@ export default function Dashboard() {
       return acc
     }, {})
 
-    const expensesByDate = storedIncoming.reduce((acc, item) => {
+    const expensesByDate = [...storedIncoming, ...storedRestockHistory].reduce((acc, item) => {
       const date = new Date(item.date).toLocaleDateString("id-ID")
       acc[date] = (acc[date] || 0) + item.purchasePrice * item.quantity
       return acc
@@ -165,7 +167,7 @@ export default function Dashboard() {
   }
 
   return (
-    (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <SummaryCard
         title="Total Penjualan"
         value={`Rp ${summary.totalSales.toLocaleString("id-ID")}`}
@@ -234,19 +236,19 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </div>)
-  );
+    </div>
+  )
 }
 
 function SummaryCard({ title, value, icon }) {
   return (
-    (<div className="card flex items-center">
+    <div className="card flex items-center">
       <div className="mr-4">{icon}</div>
       <div>
         <h3 className="text-lg font-semibold">{title}</h3>
         <p className="text-2xl font-bold">{value}</p>
       </div>
-    </div>)
-  );
+    </div>
+  )
 }
 

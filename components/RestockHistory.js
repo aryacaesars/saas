@@ -10,7 +10,10 @@ export default function RestockHistory({ restockHistory }) {
               <th className="text-left py-2 px-4">Produk</th>
               <th className="text-left py-2 px-4">Kategori</th>
               <th className="text-left py-2 px-4">Jumlah</th>
-            </tr>
+              <th className="text-left py-2 px-4">Harga Beli</th>
+              <th className="text-left py-2 px-4">Harga Jual</th>
+              <th className="text-left py-2 px-4">Total</th>
+              <th className="text-left py-2 px-4">Supplier</th>            </tr>
           </thead>
           <tbody>
             {restockHistory.map((item) => (
@@ -19,6 +22,10 @@ export default function RestockHistory({ restockHistory }) {
                 <td className="py-2 px-4">{item.productName}</td>
                 <td className="py-2 px-4">{item.category}</td>
                 <td className="py-2 px-4">{item.quantity}</td>
+                <td className="py-2 px-4">Rp {item.purchasePrice?.toLocaleString("id-ID")}</td>
+                <td className="py-2 px-4">Rp {item.sellingPrice?.toLocaleString("id-ID")}</td>
+                <td className="py-2 px-4">Rp {(item.purchasePrice * item.quantity)?.toLocaleString("id-ID")}</td>
+                <td className="py-2 px-4">{item.supplier}</td>
               </tr>
             ))}
           </tbody>

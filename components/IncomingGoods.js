@@ -79,16 +79,16 @@ export default function IncomingGoods() {
   const filteredIncomingGoods = incomingGoods
     .filter(
       (item) =>
-        item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchTerm.toLowerCase()),
+        (item.productName && item.productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.category && item.category.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 
   const filteredRestockHistory = restockHistory
     .filter(
       (item) =>
-        item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchTerm.toLowerCase()),
+        (item.productName && item.productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.category && item.category.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 
