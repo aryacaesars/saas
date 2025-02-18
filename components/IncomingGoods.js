@@ -64,6 +64,12 @@ export default function IncomingGoods() {
     localStorage.setItem("incomingGoods", JSON.stringify(updatedIncomingGoods))
   }
 
+  const handleAddCategory = (newCategory) => {
+    const updatedCategories = [...categories, newCategory]
+    setCategories(updatedCategories)
+    localStorage.setItem("categories", JSON.stringify(updatedCategories))
+  }
+
   const handleProductSearch = (searchTerm) => {
     setSearchTerm(searchTerm)
     const product = products.find((p) => p.name.toLowerCase() === searchTerm.toLowerCase())
@@ -88,7 +94,7 @@ export default function IncomingGoods() {
 
   return (
     <div className="grid grid-cols-1 gap-6">
-      <AddProductForm categories={categories} onAddProduct={handleAddProduct} />
+      <AddProductForm categories={categories} onAddProduct={handleAddProduct} onAddCategory={handleAddCategory} />
       <SearchProductForm onSearch={handleProductSearch} />
       <IncomingGoodsHistory incomingGoods={filteredIncomingGoods} />
       <RestockHistory restockHistory={filteredRestockHistory} />

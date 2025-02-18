@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import AddCategoryModal from "./AddCategoryModal";
 
-export default function AddProductForm({ categories, onAddProduct }) {
+export default function AddProductForm({ categories, onAddProduct, onAddCategory }) {
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -10,6 +11,7 @@ export default function AddProductForm({ categories, onAddProduct }) {
     stock: "",
   });
   const [supplier, setSupplier] = useState("");
+  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
 
   const handleNewProductSubmit = (e) => {
     e.preventDefault();
@@ -56,7 +58,7 @@ export default function AddProductForm({ categories, onAddProduct }) {
             </select>
             <button
               type="button"
-              onClick={() => document.getElementById("addCategoryDialog").showModal()}
+              onClick={() => setIsAddCategoryModalOpen(true)}
               className="btn btn-secondary"
             >
               <Plus size={16} />
@@ -111,6 +113,12 @@ export default function AddProductForm({ categories, onAddProduct }) {
           <Plus size={16} className="mr-2" /> Tambah Produk
         </button>
       </form>
+      {isAddCategoryModalOpen && (
+        <AddCategoryModal
+          onAddCategory={onAddCategory}
+          onClose={() => setIsAddCategoryModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
